@@ -29,7 +29,10 @@ import (
 
 const stopTrace = "[STOP-TRACE]"
 
-var eventListener unsafe.Pointer
+var (
+	eventListenerMu sync.RWMutex
+	eventListener   unsafe.Pointer
+)
 
 type TunHandler struct {
 	listener *sing_tun.Listener
@@ -208,12 +211,26 @@ func handleStartTun(callback unsafe.Pointer, fd int, stack, address, dns string)
 }
 
 func (response MethodResponse) send() {
+	if response.callback != nil {
+		defer releaseObject(response.callback)
+	}
 	data, err := response.JSON()
 	if err != nil {
-		return
+		logError("MethodResponse marshal error: id=%s err=%v", response.ID, err)
+		data, err = (&MethodResponse{
+			ID: response.ID,
+			Error: &MethodError{
+				Code:    "serialization_error",
+				Message: "failed to serialize method response",
+				Details: err.Error(),
+			},
+		}).JSON()
+		if err != nil {
+			logError("Fallback MethodResponse marshal error: id=%s err=%v", response.ID, err)
+			return
+		}
 	}
 	invokeResult(response.callback, string(data))
-	releaseObject(response.callback)
 }
 
 func handlePlatformMethodCall(call *MethodCall, response MethodResponse) bool {
@@ -282,7 +299,9 @@ func quickSetup(callback unsafe.Pointer, initParamsChar *C.char, setupParamsChar
 
 //export setEventListener
 func setEventListener(listener unsafe.Pointer) {
-	if eventListener != nil || listener == nil {
+	eventListenerMu.Lock()
+	defer eventListenerMu.Unlock()
+	if eventListener != nil {
 		releaseObject(eventListener)
 	}
 	eventListener = listener
@@ -308,9 +327,6 @@ func marshalResult(value any) string {
 }
 
 func sendMessageBatch(messages []Message) {
-	if eventListener == nil {
-		return
-	}
 	call := MethodCall{
 		Method:    messageMethod,
 		Arguments: mustMarshalJSON(messages),
@@ -319,7 +335,15 @@ func sendMessageBatch(messages []Message) {
 	if err != nil {
 		return
 	}
-	invokeResult(eventListener, string(data))
+	eventListenerMu.RLock()
+	if eventListener == nil {
+		eventListenerMu.RUnlock()
+		return
+	}
+	listener := retainObject(eventListener)
+	eventListenerMu.RUnlock()
+	defer releaseObject(listener)
+	invokeResult(listener, string(data))
 }
 
 //export stopTun

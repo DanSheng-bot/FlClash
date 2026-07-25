@@ -258,8 +258,12 @@ Future<int> _package(
   }
 
   final process = await Process.start(
-    'flutter_distributor',
+    'dart',
     [
+      'pub',
+      'global',
+      'run',
+      'flutter_distributor:main',
       'package',
       '--skip-clean',
       '--platform',

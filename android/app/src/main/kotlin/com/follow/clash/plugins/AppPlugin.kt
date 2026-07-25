@@ -118,6 +118,14 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 result.success(openAppSettings())
             }
 
+            "isAccessibilityServiceEnabled" -> {
+                result.success(isAccessibilityServiceEnabled())
+            }
+
+            "openAccessibilitySettings" -> {
+                result.success(openAccessibilitySettings())
+            }
+
             else -> {
                 result.notImplemented()
             }
@@ -181,6 +189,35 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = "package:${GlobalState.application.packageName}".toUri()
             }
+            activity.startActivity(intent)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val expectedService =
+            "${GlobalState.application.packageName}/com.follow.clash.OnDemandAccessibilityService"
+        val enabledServices = Settings.Secure.getString(
+            GlobalState.application.contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+        ) ?: return false
+        val colonSplitter = android.text.TextUtils.SimpleStringSplitter(':')
+        colonSplitter.setString(enabledServices)
+        while (colonSplitter.hasNext()) {
+            val componentName = colonSplitter.next()
+            if (componentName.equals(expectedService, ignoreCase = true)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun openAccessibilitySettings(): Boolean {
+        val activity = activity ?: return false
+        return try {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             activity.startActivity(intent)
             true
         } catch (_: Exception) {

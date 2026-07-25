@@ -22,4 +22,8 @@ object ServiceConfig {
     fun updateNotificationParams(params: NotificationParams) {
         mutableNotificationParams.value = params
     }
+
+    fun updateSuspended(isSuspended: Boolean) {
+        mutableNotificationParams.value = mutableNotificationParams.value.copy(isSuspended = isSuspended)
+    }
 }

@@ -45,10 +45,10 @@ private fun NotificationParams.extended(service: Service) =
     ExtendedNotificationParams(
         title,
         service.getString(R.string.stop),
-        if (networkSpeedNotification) {
-            Core.getSpeedTrafficText(onlyStatisticsProxy)
-        } else {
-            service.getString(R.string.connected)
+        when {
+            isSuspended -> service.getString(R.string.vpn_paused_on_demand)
+            networkSpeedNotification -> Core.getSpeedTrafficText(onlyStatisticsProxy)
+            else -> service.getString(R.string.connected)
         },
     )
 
@@ -78,7 +78,7 @@ internal class NotificationModule(
             }.collectLatest { (params, screenOn) ->
                 if (!screenOn) return@collectLatest
 
-                if (!params.networkSpeedNotification) {
+                if (!params.networkSpeedNotification || params.isSuspended) {
                     val nextParams = params.extended(service)
                     if (nextParams != displayedParams) {
                         update(nextParams)

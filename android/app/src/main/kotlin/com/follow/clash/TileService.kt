@@ -40,7 +40,7 @@ class TileService : android.service.quicksettings.TileService() {
     private fun updateTile(runState: RunState) {
         qsTile?.apply {
             state = when (runState) {
-                RunState.STARTED -> Tile.STATE_ACTIVE
+                RunState.STARTED, RunState.SUSPENDED -> Tile.STATE_ACTIVE
                 RunState.STARTING, RunState.STOPPING -> Tile.STATE_UNAVAILABLE
                 RunState.STOPPED -> Tile.STATE_INACTIVE
             }

@@ -4714,11 +4714,51 @@ class AppLocalizations {
     );
   }
 
+  /// `Disconnect VPN for Apps`
+  String get onDemandDisconnectPackages {
+    return Intl.message(
+      'Disconnect VPN for Apps',
+      name: 'onDemandDisconnectPackages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `VPN will pause when these apps are in the foreground`
+  String get onDemandDisconnectPackagesDesc {
+    return Intl.message(
+      'VPN will pause when these apps are in the foreground',
+      name: 'onDemandDisconnectPackagesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Location permission was denied, so the current Wi-Fi name cannot be obtained. Please open location permission manually in system settings.`
   String get locationPermissionDeniedMessage {
     return Intl.message(
       'Location permission was denied, so the current Wi-Fi name cannot be obtained. Please open location permission manually in system settings.',
       name: 'locationPermissionDeniedMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Accessibility Service`
+  String get accessibilityService {
+    return Intl.message(
+      'Accessibility Service',
+      name: 'accessibilityService',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Used to monitor app state for on-demand pausing. Tap to go to settings.`
+  String get accessibilityServiceDesc {
+    return Intl.message(
+      'Used to monitor app state for on-demand pausing. Tap to go to settings.',
+      name: 'accessibilityServiceDesc',
       desc: '',
       args: [],
     );

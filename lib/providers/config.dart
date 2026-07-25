@@ -113,6 +113,15 @@ class AlwaysOn extends _$AlwaysOn with AutoDisposeNotifierMixin {
   }
 }
 
+@riverpod
+class OnDemandDisconnectVpnPackages extends _$OnDemandDisconnectVpnPackages
+    with AutoDisposeNotifierMixin {
+  @override
+  List<String> build() {
+    return [];
+  }
+}
+
 @Riverpod(name: 'configProvider')
 Config _config(Ref ref) {
   final appSettingProps = ref.watch(appSettingProvider);
@@ -127,6 +136,9 @@ Config _config(Ref ref) {
   final proxiesStyleProps = ref.watch(proxiesStyleSettingProvider);
   final patchClashConfig = ref.watch(patchClashConfigProvider);
   final excludeSSIDs = ref.watch(excludeSSIDsProvider);
+  final onDemandDisconnectVpnPackages = ref.watch(
+    onDemandDisconnectVpnPackagesProvider,
+  );
   final alwaysOn = ref.watch(alwaysOnProvider);
   return Config(
     appSettingProps: appSettingProps,
@@ -141,6 +153,7 @@ Config _config(Ref ref) {
     proxiesStyleProps: proxiesStyleProps,
     patchClashConfig: patchClashConfig,
     excludeSSIDs: excludeSSIDs,
+    onDemandDisconnectVpnPackages: onDemandDisconnectVpnPackages,
     alwaysOn: alwaysOn,
   );
 }
@@ -165,6 +178,9 @@ List<Override> buildConfigOverrides(Config config) {
       (_, _) => config.patchClashConfig,
     ),
     excludeSSIDsProvider.overrideWithBuild((_, _) => config.excludeSSIDs),
+    onDemandDisconnectVpnPackagesProvider.overrideWithBuild(
+      (_, _) => config.onDemandDisconnectVpnPackages,
+    ),
     alwaysOnProvider.overrideWithBuild((_, _) => config.alwaysOn),
   ];
 }

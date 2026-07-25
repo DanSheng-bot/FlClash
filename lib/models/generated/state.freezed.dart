@@ -8169,7 +8169,7 @@ $VpnPropsCopyWith<$Res> get vpnProps {
 /// @nodoc
 mixin _$SharedState {
 
- SetupParams? get setupParams; VpnOptions? get vpnOptions; String get currentProfileName; bool get onlyStatisticsProxy; bool get networkSpeedNotification; bool get alwaysOn; List<String> get excludeSSIDs;
+ SetupParams? get setupParams; VpnOptions? get vpnOptions; String get currentProfileName; bool get onlyStatisticsProxy; bool get networkSpeedNotification; bool get alwaysOn; List<String> get excludeSSIDs; List<String> get onDemandDisconnectVpnPackages;
 /// Create a copy of SharedState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -8182,16 +8182,16 @@ $SharedStateCopyWith<SharedState> get copyWith => _$SharedStateCopyWithImpl<Shar
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SharedState&&(identical(other.setupParams, setupParams) || other.setupParams == setupParams)&&(identical(other.vpnOptions, vpnOptions) || other.vpnOptions == vpnOptions)&&(identical(other.currentProfileName, currentProfileName) || other.currentProfileName == currentProfileName)&&(identical(other.onlyStatisticsProxy, onlyStatisticsProxy) || other.onlyStatisticsProxy == onlyStatisticsProxy)&&(identical(other.networkSpeedNotification, networkSpeedNotification) || other.networkSpeedNotification == networkSpeedNotification)&&(identical(other.alwaysOn, alwaysOn) || other.alwaysOn == alwaysOn)&&const DeepCollectionEquality().equals(other.excludeSSIDs, excludeSSIDs));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SharedState&&(identical(other.setupParams, setupParams) || other.setupParams == setupParams)&&(identical(other.vpnOptions, vpnOptions) || other.vpnOptions == vpnOptions)&&(identical(other.currentProfileName, currentProfileName) || other.currentProfileName == currentProfileName)&&(identical(other.onlyStatisticsProxy, onlyStatisticsProxy) || other.onlyStatisticsProxy == onlyStatisticsProxy)&&(identical(other.networkSpeedNotification, networkSpeedNotification) || other.networkSpeedNotification == networkSpeedNotification)&&(identical(other.alwaysOn, alwaysOn) || other.alwaysOn == alwaysOn)&&const DeepCollectionEquality().equals(other.excludeSSIDs, excludeSSIDs)&&const DeepCollectionEquality().equals(other.onDemandDisconnectVpnPackages, onDemandDisconnectVpnPackages));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,setupParams,vpnOptions,currentProfileName,onlyStatisticsProxy,networkSpeedNotification,alwaysOn,const DeepCollectionEquality().hash(excludeSSIDs));
+int get hashCode => Object.hash(runtimeType,setupParams,vpnOptions,currentProfileName,onlyStatisticsProxy,networkSpeedNotification,alwaysOn,const DeepCollectionEquality().hash(excludeSSIDs),const DeepCollectionEquality().hash(onDemandDisconnectVpnPackages));
 
 @override
 String toString() {
-  return 'SharedState(setupParams: $setupParams, vpnOptions: $vpnOptions, currentProfileName: $currentProfileName, onlyStatisticsProxy: $onlyStatisticsProxy, networkSpeedNotification: $networkSpeedNotification, alwaysOn: $alwaysOn, excludeSSIDs: $excludeSSIDs)';
+  return 'SharedState(setupParams: $setupParams, vpnOptions: $vpnOptions, currentProfileName: $currentProfileName, onlyStatisticsProxy: $onlyStatisticsProxy, networkSpeedNotification: $networkSpeedNotification, alwaysOn: $alwaysOn, excludeSSIDs: $excludeSSIDs, onDemandDisconnectVpnPackages: $onDemandDisconnectVpnPackages)';
 }
 
 
@@ -8202,7 +8202,7 @@ abstract mixin class $SharedStateCopyWith<$Res>  {
   factory $SharedStateCopyWith(SharedState value, $Res Function(SharedState) _then) = _$SharedStateCopyWithImpl;
 @useResult
 $Res call({
- SetupParams? setupParams, VpnOptions? vpnOptions, String currentProfileName, bool onlyStatisticsProxy, bool networkSpeedNotification, bool alwaysOn, List<String> excludeSSIDs
+ SetupParams? setupParams, VpnOptions? vpnOptions, String currentProfileName, bool onlyStatisticsProxy, bool networkSpeedNotification, bool alwaysOn, List<String> excludeSSIDs, List<String> onDemandDisconnectVpnPackages
 });
 
 
@@ -8219,7 +8219,7 @@ class _$SharedStateCopyWithImpl<$Res>
 
 /// Create a copy of SharedState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? setupParams = freezed,Object? vpnOptions = freezed,Object? currentProfileName = null,Object? onlyStatisticsProxy = null,Object? networkSpeedNotification = null,Object? alwaysOn = null,Object? excludeSSIDs = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? setupParams = freezed,Object? vpnOptions = freezed,Object? currentProfileName = null,Object? onlyStatisticsProxy = null,Object? networkSpeedNotification = null,Object? alwaysOn = null,Object? excludeSSIDs = null,Object? onDemandDisconnectVpnPackages = null,}) {
   return _then(_self.copyWith(
 setupParams: freezed == setupParams ? _self.setupParams : setupParams // ignore: cast_nullable_to_non_nullable
 as SetupParams?,vpnOptions: freezed == vpnOptions ? _self.vpnOptions : vpnOptions // ignore: cast_nullable_to_non_nullable
@@ -8228,6 +8228,7 @@ as String,onlyStatisticsProxy: null == onlyStatisticsProxy ? _self.onlyStatistic
 as bool,networkSpeedNotification: null == networkSpeedNotification ? _self.networkSpeedNotification : networkSpeedNotification // ignore: cast_nullable_to_non_nullable
 as bool,alwaysOn: null == alwaysOn ? _self.alwaysOn : alwaysOn // ignore: cast_nullable_to_non_nullable
 as bool,excludeSSIDs: null == excludeSSIDs ? _self.excludeSSIDs : excludeSSIDs // ignore: cast_nullable_to_non_nullable
+as List<String>,onDemandDisconnectVpnPackages: null == onDemandDisconnectVpnPackages ? _self.onDemandDisconnectVpnPackages : onDemandDisconnectVpnPackages // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -8337,10 +8338,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SetupParams? setupParams,  VpnOptions? vpnOptions,  String currentProfileName,  bool onlyStatisticsProxy,  bool networkSpeedNotification,  bool alwaysOn,  List<String> excludeSSIDs)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SetupParams? setupParams,  VpnOptions? vpnOptions,  String currentProfileName,  bool onlyStatisticsProxy,  bool networkSpeedNotification,  bool alwaysOn,  List<String> excludeSSIDs,  List<String> onDemandDisconnectVpnPackages)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SharedState() when $default != null:
-return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_that.onlyStatisticsProxy,_that.networkSpeedNotification,_that.alwaysOn,_that.excludeSSIDs);case _:
+return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_that.onlyStatisticsProxy,_that.networkSpeedNotification,_that.alwaysOn,_that.excludeSSIDs,_that.onDemandDisconnectVpnPackages);case _:
   return orElse();
 
 }
@@ -8358,10 +8359,10 @@ return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SetupParams? setupParams,  VpnOptions? vpnOptions,  String currentProfileName,  bool onlyStatisticsProxy,  bool networkSpeedNotification,  bool alwaysOn,  List<String> excludeSSIDs)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SetupParams? setupParams,  VpnOptions? vpnOptions,  String currentProfileName,  bool onlyStatisticsProxy,  bool networkSpeedNotification,  bool alwaysOn,  List<String> excludeSSIDs,  List<String> onDemandDisconnectVpnPackages)  $default,) {final _that = this;
 switch (_that) {
 case _SharedState():
-return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_that.onlyStatisticsProxy,_that.networkSpeedNotification,_that.alwaysOn,_that.excludeSSIDs);case _:
+return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_that.onlyStatisticsProxy,_that.networkSpeedNotification,_that.alwaysOn,_that.excludeSSIDs,_that.onDemandDisconnectVpnPackages);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -8378,10 +8379,10 @@ return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SetupParams? setupParams,  VpnOptions? vpnOptions,  String currentProfileName,  bool onlyStatisticsProxy,  bool networkSpeedNotification,  bool alwaysOn,  List<String> excludeSSIDs)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SetupParams? setupParams,  VpnOptions? vpnOptions,  String currentProfileName,  bool onlyStatisticsProxy,  bool networkSpeedNotification,  bool alwaysOn,  List<String> excludeSSIDs,  List<String> onDemandDisconnectVpnPackages)?  $default,) {final _that = this;
 switch (_that) {
 case _SharedState() when $default != null:
-return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_that.onlyStatisticsProxy,_that.networkSpeedNotification,_that.alwaysOn,_that.excludeSSIDs);case _:
+return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_that.onlyStatisticsProxy,_that.networkSpeedNotification,_that.alwaysOn,_that.excludeSSIDs,_that.onDemandDisconnectVpnPackages);case _:
   return null;
 
 }
@@ -8393,7 +8394,7 @@ return $default(_that.setupParams,_that.vpnOptions,_that.currentProfileName,_tha
 @JsonSerializable()
 
 class _SharedState implements SharedState {
-  const _SharedState({this.setupParams, this.vpnOptions, required this.currentProfileName, required this.onlyStatisticsProxy, required this.networkSpeedNotification, this.alwaysOn = false, final  List<String> excludeSSIDs = const []}): _excludeSSIDs = excludeSSIDs;
+  const _SharedState({this.setupParams, this.vpnOptions, required this.currentProfileName, required this.onlyStatisticsProxy, required this.networkSpeedNotification, this.alwaysOn = false, final  List<String> excludeSSIDs = const [], final  List<String> onDemandDisconnectVpnPackages = const []}): _excludeSSIDs = excludeSSIDs,_onDemandDisconnectVpnPackages = onDemandDisconnectVpnPackages;
   factory _SharedState.fromJson(Map<String, dynamic> json) => _$SharedStateFromJson(json);
 
 @override final  SetupParams? setupParams;
@@ -8407,6 +8408,13 @@ class _SharedState implements SharedState {
   if (_excludeSSIDs is EqualUnmodifiableListView) return _excludeSSIDs;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_excludeSSIDs);
+}
+
+ final  List<String> _onDemandDisconnectVpnPackages;
+@override@JsonKey() List<String> get onDemandDisconnectVpnPackages {
+  if (_onDemandDisconnectVpnPackages is EqualUnmodifiableListView) return _onDemandDisconnectVpnPackages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_onDemandDisconnectVpnPackages);
 }
 
 
@@ -8423,16 +8431,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SharedState&&(identical(other.setupParams, setupParams) || other.setupParams == setupParams)&&(identical(other.vpnOptions, vpnOptions) || other.vpnOptions == vpnOptions)&&(identical(other.currentProfileName, currentProfileName) || other.currentProfileName == currentProfileName)&&(identical(other.onlyStatisticsProxy, onlyStatisticsProxy) || other.onlyStatisticsProxy == onlyStatisticsProxy)&&(identical(other.networkSpeedNotification, networkSpeedNotification) || other.networkSpeedNotification == networkSpeedNotification)&&(identical(other.alwaysOn, alwaysOn) || other.alwaysOn == alwaysOn)&&const DeepCollectionEquality().equals(other._excludeSSIDs, _excludeSSIDs));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SharedState&&(identical(other.setupParams, setupParams) || other.setupParams == setupParams)&&(identical(other.vpnOptions, vpnOptions) || other.vpnOptions == vpnOptions)&&(identical(other.currentProfileName, currentProfileName) || other.currentProfileName == currentProfileName)&&(identical(other.onlyStatisticsProxy, onlyStatisticsProxy) || other.onlyStatisticsProxy == onlyStatisticsProxy)&&(identical(other.networkSpeedNotification, networkSpeedNotification) || other.networkSpeedNotification == networkSpeedNotification)&&(identical(other.alwaysOn, alwaysOn) || other.alwaysOn == alwaysOn)&&const DeepCollectionEquality().equals(other._excludeSSIDs, _excludeSSIDs)&&const DeepCollectionEquality().equals(other._onDemandDisconnectVpnPackages, _onDemandDisconnectVpnPackages));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,setupParams,vpnOptions,currentProfileName,onlyStatisticsProxy,networkSpeedNotification,alwaysOn,const DeepCollectionEquality().hash(_excludeSSIDs));
+int get hashCode => Object.hash(runtimeType,setupParams,vpnOptions,currentProfileName,onlyStatisticsProxy,networkSpeedNotification,alwaysOn,const DeepCollectionEquality().hash(_excludeSSIDs),const DeepCollectionEquality().hash(_onDemandDisconnectVpnPackages));
 
 @override
 String toString() {
-  return 'SharedState(setupParams: $setupParams, vpnOptions: $vpnOptions, currentProfileName: $currentProfileName, onlyStatisticsProxy: $onlyStatisticsProxy, networkSpeedNotification: $networkSpeedNotification, alwaysOn: $alwaysOn, excludeSSIDs: $excludeSSIDs)';
+  return 'SharedState(setupParams: $setupParams, vpnOptions: $vpnOptions, currentProfileName: $currentProfileName, onlyStatisticsProxy: $onlyStatisticsProxy, networkSpeedNotification: $networkSpeedNotification, alwaysOn: $alwaysOn, excludeSSIDs: $excludeSSIDs, onDemandDisconnectVpnPackages: $onDemandDisconnectVpnPackages)';
 }
 
 
@@ -8443,7 +8451,7 @@ abstract mixin class _$SharedStateCopyWith<$Res> implements $SharedStateCopyWith
   factory _$SharedStateCopyWith(_SharedState value, $Res Function(_SharedState) _then) = __$SharedStateCopyWithImpl;
 @override @useResult
 $Res call({
- SetupParams? setupParams, VpnOptions? vpnOptions, String currentProfileName, bool onlyStatisticsProxy, bool networkSpeedNotification, bool alwaysOn, List<String> excludeSSIDs
+ SetupParams? setupParams, VpnOptions? vpnOptions, String currentProfileName, bool onlyStatisticsProxy, bool networkSpeedNotification, bool alwaysOn, List<String> excludeSSIDs, List<String> onDemandDisconnectVpnPackages
 });
 
 
@@ -8460,7 +8468,7 @@ class __$SharedStateCopyWithImpl<$Res>
 
 /// Create a copy of SharedState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? setupParams = freezed,Object? vpnOptions = freezed,Object? currentProfileName = null,Object? onlyStatisticsProxy = null,Object? networkSpeedNotification = null,Object? alwaysOn = null,Object? excludeSSIDs = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? setupParams = freezed,Object? vpnOptions = freezed,Object? currentProfileName = null,Object? onlyStatisticsProxy = null,Object? networkSpeedNotification = null,Object? alwaysOn = null,Object? excludeSSIDs = null,Object? onDemandDisconnectVpnPackages = null,}) {
   return _then(_SharedState(
 setupParams: freezed == setupParams ? _self.setupParams : setupParams // ignore: cast_nullable_to_non_nullable
 as SetupParams?,vpnOptions: freezed == vpnOptions ? _self.vpnOptions : vpnOptions // ignore: cast_nullable_to_non_nullable
@@ -8469,6 +8477,7 @@ as String,onlyStatisticsProxy: null == onlyStatisticsProxy ? _self.onlyStatistic
 as bool,networkSpeedNotification: null == networkSpeedNotification ? _self.networkSpeedNotification : networkSpeedNotification // ignore: cast_nullable_to_non_nullable
 as bool,alwaysOn: null == alwaysOn ? _self.alwaysOn : alwaysOn // ignore: cast_nullable_to_non_nullable
 as bool,excludeSSIDs: null == excludeSSIDs ? _self._excludeSSIDs : excludeSSIDs // ignore: cast_nullable_to_non_nullable
+as List<String>,onDemandDisconnectVpnPackages: null == onDemandDisconnectVpnPackages ? _self._onDemandDisconnectVpnPackages : onDemandDisconnectVpnPackages // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }

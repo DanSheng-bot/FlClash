@@ -292,6 +292,7 @@ abstract class Config with _$Config {
     @Default(defaultWindowProps) WindowProps windowProps,
     @Default(defaultClashConfig) PatchClashConfig patchClashConfig,
     @Default([]) List<String> excludeSSIDs,
+    @Default([]) List<String> onDemandDisconnectVpnPackages,
     @Default(false) bool alwaysOn,
   }) = _Config;
 

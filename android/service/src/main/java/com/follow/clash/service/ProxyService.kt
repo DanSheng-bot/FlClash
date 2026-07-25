@@ -44,7 +44,16 @@ class ProxyService : Service(), ManagedService {
     }
 
     override fun stop() {
+        suspend()
         modules.stop()
         stopSelf()
+    }
+
+    override fun suspend() {
+        // Just keep modules (notification) running
+    }
+
+    override fun resume() {
+        start()
     }
 }

@@ -642,12 +642,16 @@ SharedState sharedState(Ref ref) {
   final port = clashConfigVM3.b;
   final mtu = clashConfigVM3.c;
   final excludeSSIDs = ref.watch(excludeSSIDsProvider);
+  final onDemandDisconnectVpnPackages = ref.watch(
+    onDemandDisconnectVpnPackagesProvider,
+  );
   final alwaysOn = ref.watch(alwaysOnProvider);
   return SharedState(
     currentProfileName: currentProfileName,
     onlyStatisticsProxy: onlyStatisticsProxy,
     networkSpeedNotification: vpnSetting.networkSpeedNotification,
     excludeSSIDs: excludeSSIDs,
+    onDemandDisconnectVpnPackages: onDemandDisconnectVpnPackages,
     alwaysOn: alwaysOn,
     setupParams: SetupParams(selectedMap: selectedMap, testUrl: testUrl),
     vpnOptions: VpnOptions(

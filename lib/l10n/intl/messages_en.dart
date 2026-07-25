@@ -103,6 +103,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "accessControlSettings": MessageLookupByLibrary.simpleMessage(
       "Access Control Settings",
     ),
+    "accessibilityService": MessageLookupByLibrary.simpleMessage(
+      "Accessibility Service",
+    ),
+    "accessibilityServiceDesc": MessageLookupByLibrary.simpleMessage(
+      "Used to monitor app state for on-demand pausing. Tap to go to settings.",
+    ),
     "account": MessageLookupByLibrary.simpleMessage("Account"),
     "action": MessageLookupByLibrary.simpleMessage("Action"),
     "action_mode": MessageLookupByLibrary.simpleMessage("Switch Mode"),
@@ -723,6 +729,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "onDemand": MessageLookupByLibrary.simpleMessage("On Demand"),
     "onDemandDesc": MessageLookupByLibrary.simpleMessage(
       "Configure the program running state for specific scenarios",
+    ),
+    "onDemandDisconnectPackages": MessageLookupByLibrary.simpleMessage(
+      "Disconnect VPN for Apps",
+    ),
+    "onDemandDisconnectPackagesDesc": MessageLookupByLibrary.simpleMessage(
+      "VPN will pause when these apps are in the foreground",
     ),
     "onlyConfig": MessageLookupByLibrary.simpleMessage("Config Only"),
     "onlyEmoji": MessageLookupByLibrary.simpleMessage("Emoji Only"),

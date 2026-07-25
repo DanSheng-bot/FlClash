@@ -242,12 +242,17 @@ class VpnService : SystemVpnService(), ManagedService {
         GlobalState.log(
             "$STOP_TRACE VpnService.stop entered thread=${Thread.currentThread().name}",
         )
-        val modulesStartedAt = SystemClock.elapsedRealtime()
+        suspend()
         modules.stop()
+        stopSelf()
         GlobalState.log(
-            "$STOP_TRACE VpnService modules stopped in " +
-                "${SystemClock.elapsedRealtime() - modulesStartedAt}ms",
+            "$STOP_TRACE stopSelf returned in " +
+                "${SystemClock.elapsedRealtime() - startedAt}ms " +
+                "total=${SystemClock.elapsedRealtime() - startedAt}ms",
         )
+    }
+
+    override fun suspend() {
         val coreStartedAt = SystemClock.elapsedRealtime()
         GlobalState.log("$STOP_TRACE Core.stopTun begin")
         Core.stopTun()
@@ -255,13 +260,10 @@ class VpnService : SystemVpnService(), ManagedService {
             "$STOP_TRACE Core.stopTun completed in " +
                 "${SystemClock.elapsedRealtime() - coreStartedAt}ms",
         )
-        val stopSelfStartedAt = SystemClock.elapsedRealtime()
-        stopSelf()
-        GlobalState.log(
-            "$STOP_TRACE stopSelf returned in " +
-                "${SystemClock.elapsedRealtime() - stopSelfStartedAt}ms " +
-                "total=${SystemClock.elapsedRealtime() - startedAt}ms",
-        )
+    }
+
+    override fun resume() {
+        start()
     }
 
     companion object {

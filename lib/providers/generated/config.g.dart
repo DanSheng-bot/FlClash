@@ -683,6 +683,60 @@ abstract class _$AlwaysOn extends $Notifier<bool> {
   }
 }
 
+@ProviderFor(OnDemandDisconnectVpnPackages)
+final onDemandDisconnectVpnPackagesProvider =
+    OnDemandDisconnectVpnPackagesProvider._();
+
+final class OnDemandDisconnectVpnPackagesProvider
+    extends $NotifierProvider<OnDemandDisconnectVpnPackages, List<String>> {
+  OnDemandDisconnectVpnPackagesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'onDemandDisconnectVpnPackagesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$onDemandDisconnectVpnPackagesHash();
+
+  @$internal
+  @override
+  OnDemandDisconnectVpnPackages create() => OnDemandDisconnectVpnPackages();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$onDemandDisconnectVpnPackagesHash() =>
+    r'bfa724280de9efde1884c0d56598565679cd1eed';
+
+abstract class _$OnDemandDisconnectVpnPackages extends $Notifier<List<String>> {
+  List<String> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<List<String>, List<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<String>, List<String>>,
+              List<String>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(_config)
 final configProvider = _ConfigProvider._();
 
@@ -721,4 +775,4 @@ final class _ConfigProvider extends $FunctionalProvider<Config, Config, Config>
   }
 }
 
-String _$_configHash() => r'f3ce474160446d07d8267523aabab3eb7906ad28';
+String _$_configHash() => r'eaa449fb5480a2b268da2906762d5ce06e1721f9';

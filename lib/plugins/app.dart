@@ -102,6 +102,22 @@ class App {
     if (!Platform.isAndroid) return false;
     return methodChannel.invokeMethod<bool>('openAppSettings');
   }
+
+  Future<bool> isAccessibilityServiceEnabled() async {
+    if (!Platform.isAndroid) return true;
+    return await methodChannel.invokeMethod<bool>(
+          'isAccessibilityServiceEnabled',
+        ) ??
+        false;
+  }
+
+  Future<bool> openAccessibilitySettings() async {
+    if (!Platform.isAndroid) return false;
+    return await methodChannel.invokeMethod<bool>(
+          'openAccessibilitySettings',
+        ) ??
+        false;
+  }
 }
 
 final app = system.isAndroid ? App() : null;

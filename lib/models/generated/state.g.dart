@@ -22,6 +22,11 @@ _SharedState _$SharedStateFromJson(Map<String, dynamic> json) => _SharedState(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  onDemandDisconnectVpnPackages:
+      (json['onDemandDisconnectVpnPackages'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$SharedStateToJson(_SharedState instance) =>
@@ -33,4 +38,5 @@ Map<String, dynamic> _$SharedStateToJson(_SharedState instance) =>
       'networkSpeedNotification': instance.networkSpeedNotification,
       'alwaysOn': instance.alwaysOn,
       'excludeSSIDs': instance.excludeSSIDs,
+      'onDemandDisconnectVpnPackages': instance.onDemandDisconnectVpnPackages,
     };

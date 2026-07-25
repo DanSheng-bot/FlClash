@@ -25,7 +25,6 @@ android {
         namespace 'com.follow.clash.setup'
     }
     compileSdkVersion 36
-    ndkVersion android.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

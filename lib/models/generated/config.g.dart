@@ -455,6 +455,11 @@ _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  onDemandDisconnectVpnPackages:
+      (json['onDemandDisconnectVpnPackages'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   alwaysOn: json['alwaysOn'] as bool? ?? false,
 );
 
@@ -471,5 +476,6 @@ Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
   'windowProps': instance.windowProps,
   'patchClashConfig': instance.patchClashConfig,
   'excludeSSIDs': instance.excludeSSIDs,
+  'onDemandDisconnectVpnPackages': instance.onDemandDisconnectVpnPackages,
   'alwaysOn': instance.alwaysOn,
 };

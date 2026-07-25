@@ -2,4 +2,5 @@
 <resources>
     <string name="stop">暂停</string>
     <string name="connected">已连接</string>
+    <string name="vpn_paused_on_demand">VPN 已按需暂停</string>
 </resources>

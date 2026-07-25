@@ -90,6 +90,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "选中应用将会被排除在 VPN 之外",
     ),
     "accessControlSettings": MessageLookupByLibrary.simpleMessage("访问控制设置"),
+    "accessibilityService": MessageLookupByLibrary.simpleMessage("辅助功能服务"),
+    "accessibilityServiceDesc": MessageLookupByLibrary.simpleMessage(
+      "用于监听应用打开状态，以实现按需暂停。点击前往设置。",
+    ),
     "account": MessageLookupByLibrary.simpleMessage("账号"),
     "action": MessageLookupByLibrary.simpleMessage("操作"),
     "action_mode": MessageLookupByLibrary.simpleMessage("切换模式"),
@@ -507,6 +511,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberTip": m20,
     "onDemand": MessageLookupByLibrary.simpleMessage("按需运行"),
     "onDemandDesc": MessageLookupByLibrary.simpleMessage("配置程序特定场景运行状态"),
+    "onDemandDisconnectPackages": MessageLookupByLibrary.simpleMessage(
+      "运行时暂停 VPN 的应用",
+    ),
+    "onDemandDisconnectPackagesDesc": MessageLookupByLibrary.simpleMessage(
+      "当前台应用在列表中时，VPN 将自动暂停",
+    ),
     "onlyConfig": MessageLookupByLibrary.simpleMessage("仅配置"),
     "onlyEmoji": MessageLookupByLibrary.simpleMessage("仅 Emoji"),
     "onlyIcon": MessageLookupByLibrary.simpleMessage("仅图标"),

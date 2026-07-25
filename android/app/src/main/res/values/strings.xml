@@ -2,4 +2,6 @@
 <resources>
     <string name="start_vpn">Starting VPN...</string>
     <string name="stop_vpn">Stopping VPN...</string>
+    <string name="accessibility_service_name">FlClash On-Demand Service</string>
+    <string name="accessibility_service_description">Used to monitor app opening and closing for on-demand VPN pausing.</string>
 </resources>

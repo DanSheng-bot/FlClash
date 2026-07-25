@@ -9,6 +9,8 @@ data class SharedState(
     val networkSpeedNotification: Boolean = false,
     val vpnOptions: VpnOptions? = null,
     val setupParams: SetupParams? = null,
+    val excludeSSIDs: List<String> = emptyList(),
+    val onDemandDisconnectVpnPackages: List<String> = emptyList(),
 )
 
 data class SetupParams(

@@ -4,6 +4,7 @@ import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/config/on_demand_packages.dart';
 import 'package:fl_clash/views/profiles/overwrite/custom/widgets.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,24 @@ class OnDemandView extends ConsumerStatefulWidget {
 
 class _OnDemandViewState extends ConsumerState<OnDemandView>
     with UniqueKeyStateMixin {
+  bool _accessibilityServiceEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAccessibilityService();
+  }
+
+  Future<void> _checkAccessibilityService() async {
+    if (!system.isAndroid) return;
+    final enabled = await app?.isAccessibilityServiceEnabled() ?? false;
+    if (mounted) {
+      setState(() {
+        _accessibilityServiceEnabled = enabled;
+      });
+    }
+  }
+
   void _handlePermanentlyDeniedLocationPermission() {
     if (system.isMacOS) {
       final appLocalizations = context.appLocalizations;
@@ -60,6 +79,11 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
       return;
     }
     app?.openAppSettings();
+  }
+
+  void _handleOpenAccessibilitySettings() async {
+    await app?.openAccessibilitySettings();
+    _checkAccessibilityService();
   }
 
   void _handleOpenBatteryOptimizationSettings() {
@@ -210,7 +234,29 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
               child: generateSectionV3(
                 title: appLocalizations.prerequisites,
                 items: [
-                  if (system.isAndroid)
+                  if (system.isAndroid) ...[
+                    DecorationListItem(
+                      minVerticalPadding: 8,
+                      title: Text(appLocalizations.accessibilityService),
+                      subtitle: Text(appLocalizations.accessibilityServiceDesc),
+                      trailing: CommonMinFilledButtonTheme(
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _accessibilityServiceEnabled
+                                ? null
+                                : context.colorScheme.error,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            minimumSize: const Size(80, 40),
+                          ),
+                          onPressed: _handleOpenAccessibilitySettings,
+                          child: Text(
+                            _accessibilityServiceEnabled
+                                ? appLocalizations.authorized
+                                : appLocalizations.tapToAuthorize,
+                          ),
+                        ),
+                      ),
+                    ),
                     DecorationListItem(
                       minVerticalPadding: 8,
                       title: Text(appLocalizations.ignoreBatteryOptimization),
@@ -261,6 +307,7 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
                               ],
                             ),
                     ),
+                  ],
                   if (system.isAndroid || system.isMacOS)
                     DecorationListItem(
                       minVerticalPadding: 8,
@@ -288,6 +335,29 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
               ),
             ),
           ),
+          if (system.isAndroid)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverToBoxAdapter(
+                child: generateSectionV3(
+                  items: [
+                    ListItem(
+                      title: Text(appLocalizations.onDemandDisconnectPackages),
+                      subtitle: Text(
+                        appLocalizations.onDemandDisconnectPackagesDesc,
+                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const OnDemandPackagesView(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(

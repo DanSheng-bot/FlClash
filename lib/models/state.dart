@@ -307,6 +307,7 @@ abstract class SharedState with _$SharedState {
     required bool networkSpeedNotification,
     @Default(false) bool alwaysOn,
     @Default([]) List<String> excludeSSIDs,
+    @Default([]) List<String> onDemandDisconnectVpnPackages,
   }) = _SharedState;
 
   factory SharedState.fromJson(Map<String, Object?> json) =>

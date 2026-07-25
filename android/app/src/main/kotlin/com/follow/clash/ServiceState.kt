@@ -22,6 +22,7 @@ enum class RunState {
     STARTING,
     STOPPING,
     STOPPED,
+    SUSPENDED,
 }
 
 private const val MISSING_CONFIG_MESSAGE = "No configuration found."
@@ -37,6 +38,9 @@ object ServiceState {
     private var sharedState = SharedState()
     @Volatile
     private var flutterEngine: FlutterEngine? = null
+
+    val onDemandPackages: List<String>
+        get() = sharedState.onDemandDisconnectVpnPackages ?: emptyList()
 
     val runState = mutableRunState.asStateFlow()
 
@@ -61,7 +65,7 @@ object ServiceState {
 
     suspend fun handleToggleAction() {
         when (runState.value) {
-            RunState.STARTED -> handleStopAction()
+            RunState.STARTED, RunState.SUSPENDED -> handleStopAction()
             RunState.STOPPED -> handleStartAction()
             RunState.STARTING, RunState.STOPPING -> Unit
         }
@@ -90,7 +94,7 @@ object ServiceState {
 
     suspend fun handleStopAction() {
         val shouldStopInBackground = lock.withLock {
-            if (runState.value != RunState.STARTED) {
+            if (runState.value != RunState.STARTED && runState.value != RunState.SUSPENDED) {
                 return@withLock false
             }
             tilePlugin?.handleStop()
@@ -115,6 +119,19 @@ object ServiceState {
 
     fun requestStop() {
         launchStop("MethodChannel")
+    }
+
+    suspend fun suspend() = lock.withLock {
+        if (runState.value != RunState.STARTED) return@withLock
+        mutableRunState.value = RunState.SUSPENDED
+        ServiceController.suspend()
+    }
+
+    suspend fun resume() = lock.withLock {
+        if (runState.value != RunState.SUSPENDED) return@withLock
+        mutableRunState.value = RunState.STARTED
+        val options = sharedState.vpnOptions ?: return@withLock
+        ServiceController.resume(options)
     }
 
     fun syncSharedState(state: SharedState) {
@@ -278,7 +295,7 @@ object ServiceState {
                         "dispatch=${coroutineStartedAt - requestedAt}ms " +
                         "lock=${lockAcquiredAt - coroutineStartedAt}ms",
                 )
-                if (runState.value != RunState.STARTED) {
+                if (runState.value != RunState.STARTED && runState.value != RunState.SUSPENDED) {
                     GlobalState.log(
                         "$STOP_TRACE stop ignored state=${runState.value} " +
                             "elapsed=${SystemClock.elapsedRealtime() - requestedAt}ms",

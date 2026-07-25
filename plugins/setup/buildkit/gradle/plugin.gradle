@@ -14,6 +14,12 @@ def androidArch = System.getenv('ANDROID_ARCH')
 def targetPlatform = project.findProperty('target-platform') ?:
         rootProject.findProperty('target-platform')
 def androidNdk = System.getenv('ANDROID_NDK')
+if (androidNdk == null) {
+    try {
+        androidNdk = project.android.ndkDirectory.absolutePath
+    } catch (ignore) {
+    }
+}
 def archArgs = androidArch
         ? ['--arch', androidArch]
         : (targetPlatform ? ['--target-platform', targetPlatform.toString()] : [])
@@ -26,7 +32,9 @@ task buildGoCore(type: Exec) {
     workingDir projectRoot
     commandLine command
 
-    environment 'ANDROID_NDK', androidNdk
+    if (androidNdk != null) {
+        environment 'ANDROID_NDK', androidNdk
+    }
     environment 'APP_ENV', project.hasProperty('appEnv') ? project.appEnv : 'pre'
     environment 'PROJECT_DIR', projectRoot
 }

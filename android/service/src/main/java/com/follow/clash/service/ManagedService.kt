@@ -9,6 +9,10 @@ interface ManagedService {
     fun start()
 
     fun stop()
+
+    fun suspend()
+
+    fun resume()
 }
 
 internal fun Service.notifyCreated() {

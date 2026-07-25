@@ -104,7 +104,23 @@ object ServiceController {
 
         runTimeMillis = previousRunTimeMillis.takeIf { it != 0L }
             ?: System.currentTimeMillis()
+        ServiceConfig.updateSuspended(false)
         runTimeMillis
+    }
+
+    suspend fun suspend() = lock.withLock {
+        binding?.useService { service ->
+            service.suspend()
+        }
+        ServiceConfig.updateSuspended(true)
+    }
+
+    suspend fun resume(options: VpnOptions) = lock.withLock {
+        ServiceConfig.updateVpnOptions(options)
+        binding?.useService { service ->
+            service.resume()
+        }
+        ServiceConfig.updateSuspended(false)
     }
 
     suspend fun stop(): Long {

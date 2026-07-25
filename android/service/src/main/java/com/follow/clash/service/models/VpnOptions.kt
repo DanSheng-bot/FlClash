@@ -25,6 +25,12 @@ data class VpnOptions(
     val stack: String,
     val mtu: Int?,
     val routeAddress: List<String>,
+    val includeAllNetworks: Boolean = false,
+    val excludeLocalNetworks: Boolean = true,
+    val excludeAPNs: Boolean = true,
+    val excludeCellularServices: Boolean = true,
+    val enforceRoutes: Boolean = false,
+    val excludeDeviceCommunication: Boolean = true,
 )
 
 data class CIDR(

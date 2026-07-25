@@ -24,8 +24,11 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 	"unsafe"
 )
+
+const stopTrace = "[STOP-TRACE]"
 
 var eventListener unsafe.Pointer
 
@@ -48,22 +51,62 @@ func (th *TunHandler) start(fd int, stack, address, dns string) {
 		th.listener = tunListener
 		return
 	}
-	th.clear()
+	th.clear(false)
 }
 
-func (th *TunHandler) close() {
+func (th *TunHandler) close(trace bool) {
+	startedAt := time.Now()
+	if trace {
+		log.Infoln("%s waiting for TUN callback permits", stopTrace)
+	}
 	_ = th.limit.Acquire(context.TODO(), 4)
 	defer th.limit.Release(4)
-	th.clear()
+	if trace {
+		log.Infoln(
+			"%s TUN callback permits acquired in %dms",
+			stopTrace,
+			time.Since(startedAt).Milliseconds(),
+		)
+	}
+	th.clear(trace)
+	if trace {
+		log.Infoln(
+			"%s TunHandler.close completed in %dms",
+			stopTrace,
+			time.Since(startedAt).Milliseconds(),
+		)
+	}
 }
 
-func (th *TunHandler) clear() {
+func (th *TunHandler) clear(trace bool) {
 	th.removeHook()
 	if th.listener != nil {
+		listenerStartedAt := time.Now()
+		if trace {
+			log.Infoln("%s TUN listener close begin", stopTrace)
+		}
 		_ = th.listener.Close()
+		if trace {
+			log.Infoln(
+				"%s TUN listener close completed in %dms",
+				stopTrace,
+				time.Since(listenerStartedAt).Milliseconds(),
+			)
+		}
 	}
 	if th.callback != nil {
+		callbackStartedAt := time.Now()
+		if trace {
+			log.Infoln("%s TUN callback release begin", stopTrace)
+		}
 		releaseObject(th.callback)
+		if trace {
+			log.Infoln(
+				"%s TUN callback release completed in %dms",
+				stopTrace,
+				time.Since(callbackStartedAt).Milliseconds(),
+			)
+		}
 	}
 	th.callback = nil
 	th.listener = nil
@@ -130,16 +173,29 @@ var (
 	tunHandler *TunHandler
 )
 
-func handleStopTun() {
+func handleStopTun(trace bool) {
+	startedAt := time.Now()
+	if trace {
+		log.Infoln("%s waiting for tunLock", stopTrace)
+	}
 	tunLock.Lock()
 	defer tunLock.Unlock()
+	if trace {
+		log.Infoln(
+			"%s tunLock acquired in %dms",
+			stopTrace,
+			time.Since(startedAt).Milliseconds(),
+		)
+	}
 	if tunHandler != nil {
-		tunHandler.close()
+		tunHandler.close(trace)
+	} else if trace {
+		log.Infoln("%s no active TunHandler", stopTrace)
 	}
 }
 
 func handleStartTun(callback unsafe.Pointer, fd int, stack, address, dns string) {
-	handleStopTun()
+	handleStopTun(false)
 	tunLock.Lock()
 	defer tunLock.Unlock()
 	if fd != 0 {
@@ -276,10 +332,29 @@ func sendMessageBatch(messages []Message) {
 
 //export stopTun
 func stopTun() {
-	handleStopTun()
+	startedAt := time.Now()
+	log.Infoln("%s core stopTun begin isRunning=%t", stopTrace, isRunning)
+	handleStopTun(true)
+	log.Infoln(
+		"%s core TUN stopped in %dms",
+		stopTrace,
+		time.Since(startedAt).Milliseconds(),
+	)
 	if isRunning {
+		listenersStartedAt := time.Now()
+		log.Infoln("%s core listener stop begin", stopTrace)
 		handleStopListener()
+		log.Infoln(
+			"%s core listener stop completed in %dms",
+			stopTrace,
+			time.Since(listenersStartedAt).Milliseconds(),
+		)
 	}
+	log.Infoln(
+		"%s core stopTun completed in %dms",
+		stopTrace,
+		time.Since(startedAt).Milliseconds(),
+	)
 }
 
 //export suspend

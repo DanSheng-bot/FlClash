@@ -6,6 +6,7 @@ import android.net.ProxyInfo
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.follow.clash.common.AccessControlMode
@@ -22,6 +23,8 @@ import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import android.net.VpnService as SystemVpnService
 
+private const val STOP_TRACE = "[STOP-TRACE]"
+
 class VpnService : SystemVpnService(), ManagedService {
     private val modules = ServiceModules(this)
     private val binder = LocalBinder()
@@ -32,9 +35,19 @@ class VpnService : SystemVpnService(), ManagedService {
     }
 
     override fun onDestroy() {
+        val startedAt = SystemClock.elapsedRealtime()
+        GlobalState.log("$STOP_TRACE VpnService.onDestroy entered")
         modules.stop()
+        GlobalState.log(
+            "$STOP_TRACE VpnService.onDestroy modules stopped in " +
+                "${SystemClock.elapsedRealtime() - startedAt}ms",
+        )
         notifyDestroyed()
         super.onDestroy()
+        GlobalState.log(
+            "$STOP_TRACE VpnService.onDestroy completed in " +
+                "${SystemClock.elapsedRealtime() - startedAt}ms",
+        )
     }
 
     private val connectivity by lazy {
@@ -105,6 +118,7 @@ class VpnService : SystemVpnService(), ManagedService {
         }
 
     override fun onRevoke() {
+        GlobalState.log("$STOP_TRACE VpnService.onRevoke received")
         stop()
         notifyDestroyed()
     }
@@ -222,9 +236,30 @@ class VpnService : SystemVpnService(), ManagedService {
     }
 
     override fun stop() {
+        val startedAt = SystemClock.elapsedRealtime()
+        GlobalState.log(
+            "$STOP_TRACE VpnService.stop entered thread=${Thread.currentThread().name}",
+        )
+        val modulesStartedAt = SystemClock.elapsedRealtime()
         modules.stop()
+        GlobalState.log(
+            "$STOP_TRACE VpnService modules stopped in " +
+                "${SystemClock.elapsedRealtime() - modulesStartedAt}ms",
+        )
+        val coreStartedAt = SystemClock.elapsedRealtime()
+        GlobalState.log("$STOP_TRACE Core.stopTun begin")
         Core.stopTun()
+        GlobalState.log(
+            "$STOP_TRACE Core.stopTun completed in " +
+                "${SystemClock.elapsedRealtime() - coreStartedAt}ms",
+        )
+        val stopSelfStartedAt = SystemClock.elapsedRealtime()
         stopSelf()
+        GlobalState.log(
+            "$STOP_TRACE stopSelf returned in " +
+                "${SystemClock.elapsedRealtime() - stopSelfStartedAt}ms " +
+                "total=${SystemClock.elapsedRealtime() - startedAt}ms",
+        )
     }
 
     companion object {

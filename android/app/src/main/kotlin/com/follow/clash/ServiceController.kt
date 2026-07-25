@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import com.follow.clash.common.GlobalState
 import com.follow.clash.common.intent
 import com.follow.clash.core.Core
@@ -27,6 +28,8 @@ import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+private const val STOP_TRACE = "[STOP-TRACE]"
+
 object ServiceController {
     private val lock = Mutex()
     private var binding: ManagedServiceBinding? = null
@@ -43,8 +46,8 @@ object ServiceController {
         clearBinding()
     }
 
-    private fun clearBinding() {
-        binding?.unbind()
+    private fun clearBinding(stopStartedAt: Long? = null) {
+        binding?.unbind(stopStartedAt)
         binding = null
     }
 
@@ -104,14 +107,60 @@ object ServiceController {
         runTimeMillis
     }
 
-    suspend fun stop(): Long = lock.withLock {
-        binding?.useService { service -> service.stop() }
-            ?.onFailure { error ->
-                GlobalState.log("Unable to stop background service: $error")
+    suspend fun stop(): Long {
+        val requestedAt = SystemClock.elapsedRealtime()
+        GlobalState.log(
+            "$STOP_TRACE controller stop waiting for lock " +
+                "binding=${binding?.component?.className}",
+        )
+        return lock.withLock {
+            val lockAcquiredAt = SystemClock.elapsedRealtime()
+            GlobalState.log(
+                "$STOP_TRACE controller lock acquired in " +
+                    "${lockAcquiredAt - requestedAt}ms",
+            )
+            val currentBinding = binding
+            if (currentBinding == null) {
+                GlobalState.log("$STOP_TRACE controller has no service binding")
+            } else {
+                val useServiceStartedAt = SystemClock.elapsedRealtime()
+                val stopResult = currentBinding.useService { service ->
+                    val serviceAcquiredAt = SystemClock.elapsedRealtime()
+                    GlobalState.log(
+                        "$STOP_TRACE service acquired in " +
+                            "${serviceAcquiredAt - useServiceStartedAt}ms; " +
+                            "calling ${service.javaClass.simpleName}.stop",
+                    )
+                    try {
+                        service.stop()
+                    } finally {
+                        GlobalState.log(
+                            "$STOP_TRACE ${service.javaClass.simpleName}.stop finished in " +
+                                "${SystemClock.elapsedRealtime() - serviceAcquiredAt}ms",
+                        )
+                    }
+                }
+                GlobalState.log(
+                    "$STOP_TRACE useService completed in " +
+                        "${SystemClock.elapsedRealtime() - useServiceStartedAt}ms " +
+                        "success=${stopResult.isSuccess}",
+                )
+                stopResult.onFailure { error ->
+                    GlobalState.log("Unable to stop background service: $error")
+                }
             }
-        clearBinding()
-        runTimeMillis = 0L
-        runTimeMillis
+            clearBinding(requestedAt)
+            GlobalState.log(
+                "$STOP_TRACE binding cleared in " +
+                    "${SystemClock.elapsedRealtime() - requestedAt}ms",
+            )
+            runTimeMillis = 0L
+            GlobalState.log(
+                "$STOP_TRACE controller stop completed in " +
+                    "${SystemClock.elapsedRealtime() - requestedAt}ms",
+            )
+            runTimeMillis
+        }
     }
 
     fun getRunTimeMillis(): Long = runTimeMillis
@@ -173,15 +222,42 @@ private class ManagedServiceBinding(
         }
     }
 
-    fun unbind() {
+    fun unbind(stopStartedAt: Long? = null) {
         serviceState.value = null
-        if (!isBound) return
+        if (!isBound) {
+            if (stopStartedAt != null) {
+                GlobalState.log("$STOP_TRACE unbind skipped because service is not bound")
+            }
+            return
+        }
         isBound = false
+        val postedAt = SystemClock.elapsedRealtime()
+        if (stopStartedAt != null) {
+            GlobalState.log(
+                "$STOP_TRACE unbind posted to main thread at " +
+                    "${postedAt - stopStartedAt}ms",
+            )
+        }
         Handler(Looper.getMainLooper()).post {
-            runCatching {
+            val startedAt = SystemClock.elapsedRealtime()
+            if (stopStartedAt != null) {
+                GlobalState.log(
+                    "$STOP_TRACE unbind running on main thread " +
+                        "queue=${startedAt - postedAt}ms total=${startedAt - stopStartedAt}ms",
+                )
+            }
+            val result = runCatching {
                 GlobalState.application.unbindService(this)
-            }.onFailure { error ->
+            }
+            result.onFailure { error ->
                 GlobalState.log("Unable to unbind background service: $error")
+            }
+            if (stopStartedAt != null) {
+                GlobalState.log(
+                    "$STOP_TRACE unbind finished in " +
+                        "${SystemClock.elapsedRealtime() - startedAt}ms " +
+                        "success=${result.isSuccess}",
+                )
             }
         }
     }

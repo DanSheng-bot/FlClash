@@ -1,10 +1,14 @@
 package com.follow.clash.service.modules
 
 import android.app.Service
+import android.os.SystemClock
+import com.follow.clash.common.GlobalState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+
+private const val STOP_TRACE = "[STOP-TRACE]"
 
 internal interface ServiceModule {
     fun start()
@@ -44,16 +48,52 @@ internal class ServiceModules(private val service: Service) {
         }
     }
 
-    @Synchronized
     fun stop() {
-        val currentScope = scope ?: return
-        val currentModules = modules
-        scope = null
-        modules = emptyList()
+        val requestedAt = SystemClock.elapsedRealtime()
+        GlobalState.log(
+            "$STOP_TRACE ServiceModules.stop waiting for monitor " +
+                "service=${service.javaClass.simpleName}",
+        )
+        synchronized(this) {
+            val startedAt = SystemClock.elapsedRealtime()
+            GlobalState.log(
+                "$STOP_TRACE ServiceModules monitor acquired in " +
+                    "${startedAt - requestedAt}ms",
+            )
+            val currentScope = scope
+            if (currentScope == null) {
+                GlobalState.log("$STOP_TRACE ServiceModules.stop has no active modules")
+                return
+            }
+            val currentModules = modules
+            scope = null
+            modules = emptyList()
 
-        currentScope.cancel()
-        currentModules.asReversed().forEach { module ->
-            runCatching { module.stop() }
+            currentScope.cancel()
+            GlobalState.log(
+                "$STOP_TRACE ServiceModules scope cancelled; " +
+                    "stopping ${currentModules.size} modules",
+            )
+            currentModules.asReversed().forEach { module ->
+                val moduleStartedAt = SystemClock.elapsedRealtime()
+                runCatching { module.stop() }
+                    .onSuccess {
+                        GlobalState.log(
+                            "$STOP_TRACE ${module.javaClass.simpleName}.stop completed in " +
+                                "${SystemClock.elapsedRealtime() - moduleStartedAt}ms",
+                        )
+                    }
+                    .onFailure { error ->
+                        GlobalState.log(
+                            "$STOP_TRACE ${module.javaClass.simpleName}.stop failed after " +
+                                "${SystemClock.elapsedRealtime() - moduleStartedAt}ms: $error",
+                        )
+                    }
+            }
+            GlobalState.log(
+                "$STOP_TRACE ServiceModules.stop completed in " +
+                    "${SystemClock.elapsedRealtime() - startedAt}ms",
+            )
         }
     }
 }

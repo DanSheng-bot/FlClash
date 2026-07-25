@@ -1,11 +1,15 @@
 package com.follow.clash.service.modules
 
 import android.app.Notification.FOREGROUND_SERVICE_IMMEDIATE
+import android.app.NotificationManager
 import android.app.Service
 import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import com.follow.clash.common.Components
@@ -29,6 +33,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+
+private const val STOP_TRACE = "[STOP-TRACE]"
+private val NOTIFICATION_CHECK_DELAYS = longArrayOf(0L, 250L, 1_000L, 3_000L)
 
 private data class ExtendedNotificationParams(
     val title: String,
@@ -117,10 +124,52 @@ internal class NotificationModule(
 
     @Suppress("DEPRECATION")
     override fun stop() {
+        val startedAt = SystemClock.elapsedRealtime()
+        GlobalState.log(
+            "$STOP_TRACE stopForeground begin sdk=${Build.VERSION.SDK_INT}",
+        )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             service.stopForeground(STOP_FOREGROUND_REMOVE)
         } else {
             service.stopForeground(true)
+        }
+        GlobalState.log(
+            "$STOP_TRACE stopForeground returned in " +
+                "${SystemClock.elapsedRealtime() - startedAt}ms",
+        )
+        traceNotificationRemoval(startedAt)
+    }
+
+    private fun traceNotificationRemoval(stopStartedAt: Long) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        val notificationManager = service.getSystemService<NotificationManager>()
+        if (notificationManager == null) {
+            GlobalState.log("$STOP_TRACE NotificationManager is unavailable")
+            return
+        }
+        val handler = Handler(Looper.getMainLooper())
+        NOTIFICATION_CHECK_DELAYS.forEach { delayMillis ->
+            handler.postDelayed(
+                {
+                    val actualElapsed = SystemClock.elapsedRealtime() - stopStartedAt
+                    runCatching {
+                        notificationManager.activeNotifications.any { notification ->
+                            notification.id == GlobalState.NOTIFICATION_ID
+                        }
+                    }.onSuccess { active ->
+                        GlobalState.log(
+                            "$STOP_TRACE notification check scheduled=${delayMillis}ms " +
+                                "actual=${actualElapsed}ms active=$active",
+                        )
+                    }.onFailure { error ->
+                        GlobalState.log(
+                            "$STOP_TRACE notification check failed " +
+                                "scheduled=${delayMillis}ms actual=${actualElapsed}ms: $error",
+                        )
+                    }
+                },
+                delayMillis,
+            )
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.follow.clash
 
 import android.net.VpnService
+import android.os.SystemClock
 import com.follow.clash.common.GlobalState
 import com.follow.clash.models.SharedState
 import com.follow.clash.plugins.AppPlugin
@@ -27,6 +28,7 @@ private const val MISSING_CONFIG_MESSAGE = "No configuration found."
 private const val INVALID_CONFIG_MESSAGE = "Invalid configuration."
 private const val VPN_PERMISSION_MESSAGE = "VPN permission required."
 private const val START_FAILED_MESSAGE = "Failed to start service."
+private const val STOP_TRACE = "[STOP-TRACE]"
 
 object ServiceState {
     private val lock = Mutex()
@@ -96,7 +98,7 @@ object ServiceState {
         }
         if (shouldStopInBackground) {
             GlobalState.application.showToast(sharedState.stopTip)
-            launchStop()
+            launchStop("background action")
         }
     }
 
@@ -110,7 +112,7 @@ object ServiceState {
     }
 
     fun requestStop() {
-        launchStop()
+        launchStop("MethodChannel")
     }
 
     fun syncSharedState(state: SharedState) {
@@ -259,15 +261,48 @@ object ServiceState {
         }
     }
 
-    private fun launchStop() {
+    private fun launchStop(source: String) {
+        val requestedAt = SystemClock.elapsedRealtime()
+        GlobalState.log(
+            "$STOP_TRACE stop queued source=$source state=${runState.value}",
+        )
         GlobalState.launch {
+            val coroutineStartedAt = SystemClock.elapsedRealtime()
             lock.withLock {
+                val lockAcquiredAt = SystemClock.elapsedRealtime()
+                GlobalState.log(
+                    "$STOP_TRACE state lock acquired " +
+                        "dispatch=${coroutineStartedAt - requestedAt}ms " +
+                        "lock=${lockAcquiredAt - coroutineStartedAt}ms",
+                )
                 if (runState.value != RunState.STARTED) {
+                    GlobalState.log(
+                        "$STOP_TRACE stop ignored state=${runState.value} " +
+                            "elapsed=${SystemClock.elapsedRealtime() - requestedAt}ms",
+                    )
                     return@withLock
                 }
                 mutableRunState.value = RunState.STOPPING
-                runTimeMillis = ServiceController.stop()
+                GlobalState.log("$STOP_TRACE state changed to STOPPING")
+                val controllerStartedAt = SystemClock.elapsedRealtime()
+                try {
+                    runTimeMillis = ServiceController.stop()
+                } catch (error: Throwable) {
+                    GlobalState.log(
+                        "$STOP_TRACE ServiceController.stop failed after " +
+                            "${SystemClock.elapsedRealtime() - controllerStartedAt}ms: $error",
+                    )
+                    throw error
+                }
+                GlobalState.log(
+                    "$STOP_TRACE ServiceController.stop completed in " +
+                        "${SystemClock.elapsedRealtime() - controllerStartedAt}ms",
+                )
                 mutableRunState.value = RunState.STOPPED
+                GlobalState.log(
+                    "$STOP_TRACE state changed to STOPPED " +
+                        "total=${SystemClock.elapsedRealtime() - requestedAt}ms",
+                )
             }
         }
     }

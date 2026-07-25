@@ -3,6 +3,7 @@ package com.follow.clash.plugins
 import com.follow.clash.ServiceController
 import com.follow.clash.ServiceState
 import com.follow.clash.common.Components
+import com.follow.clash.common.GlobalState
 import com.follow.clash.invokeMethodOnMainThread
 import com.follow.clash.models.SharedState
 import com.google.gson.Gson
@@ -14,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+
+private const val STOP_TRACE = "[STOP-TRACE]"
 
 class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private lateinit var channel: MethodChannel
@@ -103,8 +106,10 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private fun stop(result: MethodChannel.Result) {
+        GlobalState.log("$STOP_TRACE MethodChannel stop received")
         ServiceState.requestStop()
         result.success(true)
+        GlobalState.log("$STOP_TRACE MethodChannel stop acknowledged")
     }
 
     private fun sendEvent(value: String?) {

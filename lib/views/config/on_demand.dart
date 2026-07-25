@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/plugins/app.dart';
@@ -190,6 +191,97 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     ref.read(itemsProvider(key).notifier).value = {};
   }
 
+  void _handleDeletePackages() {
+    final packageKey = "${key}_packages";
+    final selectedItems = ref.read(itemsProvider(packageKey));
+    globalState.container
+        .read(onDemandDisconnectVpnPackagesProvider.notifier)
+        .update((packages) {
+      return packages.where((item) => !selectedItems.contains(item)).toList();
+    });
+    ref.read(itemsProvider(packageKey).notifier).value = {};
+  }
+
+  Widget _buildPackageItem({
+    required String packageName,
+    required int index,
+    required int length,
+    required bool isSelected,
+    required bool isEditing,
+  }) {
+    final position = ItemPosition.get(index, length);
+    final packageKey = "${key}_packages";
+    final packages = ref.read(packagesProvider);
+    final package =
+        packages.firstWhereOrNull((p) => p.packageName == packageName);
+
+    return ReorderableDelayedDragStartListener(
+      key: ValueKey(packageName),
+      index: index,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: ItemPositionProvider(
+          position: position,
+          child: SelectedDecorationListItem(
+            isEditing: isEditing,
+            minVerticalPadding: 8,
+            leading: SizedBox(
+              width: 36,
+              height: 36,
+              child: FutureBuilder<ImageProvider?>(
+                future: app?.getPackageIcon(packageName),
+                builder: (_, snapshot) {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return Image(
+                      image: snapshot.data!,
+                      width: 36,
+                      height: 36,
+                    );
+                  }
+                  return const Icon(Icons.android);
+                },
+              ),
+            ),
+            title: TooltipText(
+              text: Text(
+                package?.label ?? packageName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            subtitle: Text(
+              packageName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.bodySmall,
+            ),
+            isSelected: isSelected,
+            onSelected: () {
+              ref.read(itemsProvider(packageKey).notifier).update((state) {
+                final newState = Set<String>.from(state)..addOrRemove(packageName);
+                return newState;
+              });
+            },
+            onPressed: () {
+              ref.read(itemsProvider(packageKey).notifier).update((state) {
+                final newState = Set<String>.from(state)..addOrRemove(packageName);
+                return newState;
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleReorderPackages(int oldIndex, int newIndex) {
+    globalState.container
+        .read(onDemandDisconnectVpnPackagesProvider.notifier)
+        .update((value) {
+      return value.copyAndReorder(oldIndex, newIndex);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
@@ -207,6 +299,11 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     );
     final alwaysOn = ref.watch(alwaysOnProvider);
     final selectedItems = ref.watch(itemsProvider(key));
+
+    final onDemandPackages = ref.watch(onDemandDisconnectVpnPackagesProvider);
+    final packageKey = "${key}_packages";
+    final selectedPackages = ref.watch(itemsProvider(packageKey));
+
     return CommonScaffold(
       body: CustomScrollView(
         slivers: [
@@ -335,27 +432,84 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
               ),
             ),
           ),
-          if (system.isAndroid)
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverToBoxAdapter(
-                child: generateSectionV3(
-                  items: [
-                    ListItem(
-                      title: Text(appLocalizations.onDemandDisconnectPackages),
-                      subtitle: Text(
-                        appLocalizations.onDemandDisconnectPackagesDesc,
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: ListHeader(
+                title: appLocalizations.onDemandDisconnectPackages,
+                subTitle: appLocalizations.onDemandDisconnectPackagesDesc,
+                actions: [
+                  const SizedBox(width: 8),
+                  if (selectedPackages.isNotEmpty)
+                    CommonMinIconButtonTheme(
+                      child: IconButton.filledTonal(
+                        tooltip: appLocalizations.delete,
+                        onPressed: _handleDeletePackages,
+                        icon: const Icon(Icons.delete),
                       ),
-                      onTap: () {
+                    ),
+                  const SizedBox(width: 2),
+                  CommonMinFilledButtonTheme(
+                    child: FilledButton.tonal(
+                      onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const OnDemandPackagesView(),
                           ),
                         );
                       },
+                      child: Text(appLocalizations.add),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (onDemandPackages.isEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ).copyWith(top: 12),
+              sliver: SliverToBoxAdapter(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 0,
+                    vertical: 48,
+                  ),
+                  child: NullStatus(label: appLocalizations.noData),
                 ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.only(top: 12),
+              sliver: SliverReorderableList(
+                itemBuilder: (_, index) {
+                  final packageName = onDemandPackages[index];
+                  return _buildPackageItem(
+                    isEditing: selectedPackages.isNotEmpty,
+                    packageName: packageName,
+                    index: index,
+                    isSelected: selectedPackages.contains(packageName),
+                    length: onDemandPackages.length,
+                  );
+                },
+                proxyDecorator: (child, index, animation) {
+                  final packageName = onDemandPackages[index];
+                  return commonProxyDecorator(
+                    _buildPackageItem(
+                      isEditing: selectedPackages.isNotEmpty,
+                      packageName: packageName,
+                      index: index,
+                      isSelected: selectedPackages.contains(packageName),
+                      length: onDemandPackages.length,
+                    ),
+                    index,
+                    animation,
+                  );
+                },
+                itemCount: onDemandPackages.length,
+                onReorderItem: _handleReorderPackages,
               ),
             ),
           SliverPadding(

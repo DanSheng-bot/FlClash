@@ -137,6 +137,7 @@ object ServiceState {
     fun syncSharedState(state: SharedState) {
         sharedState = state
         applySharedState()
+        OnDemandAccessibilityService.updateConfig()
     }
 
     fun handleServiceDisconnected() {

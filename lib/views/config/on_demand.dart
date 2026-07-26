@@ -21,24 +21,6 @@ class OnDemandView extends ConsumerStatefulWidget {
 
 class _OnDemandViewState extends ConsumerState<OnDemandView>
     with UniqueKeyStateMixin {
-  bool _accessibilityServiceEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAccessibilityService();
-  }
-
-  Future<void> _checkAccessibilityService() async {
-    if (!system.isAndroid) return;
-    final enabled = await app?.isAccessibilityServiceEnabled() ?? false;
-    if (mounted) {
-      setState(() {
-        _accessibilityServiceEnabled = enabled;
-      });
-    }
-  }
-
   void _handlePermanentlyDeniedLocationPermission() {
     if (system.isMacOS) {
       final appLocalizations = context.appLocalizations;
@@ -84,7 +66,6 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
 
   void _handleOpenAccessibilitySettings() async {
     await app?.openAccessibilitySettings();
-    _checkAccessibilityService();
   }
 
   void _handleOpenBatteryOptimizationSettings() {
@@ -300,6 +281,7 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     final alwaysOn = ref.watch(alwaysOnProvider);
     final selectedItems = ref.watch(itemsProvider(key));
 
+    final accessibilityServiceEnabled = ref.watch(accessibilityServiceEnabledProvider);
     final onDemandPackages = ref.watch(onDemandDisconnectVpnPackagesProvider);
     final packageKey = "${key}_packages";
     final selectedPackages = ref.watch(itemsProvider(packageKey));
@@ -339,7 +321,7 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
                       trailing: CommonMinFilledButtonTheme(
                         child: FilledButton(
                           style: FilledButton.styleFrom(
-                            backgroundColor: _accessibilityServiceEnabled
+                            backgroundColor: accessibilityServiceEnabled
                                 ? null
                                 : context.colorScheme.error,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -347,7 +329,7 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
                           ),
                           onPressed: _handleOpenAccessibilitySettings,
                           child: Text(
-                            _accessibilityServiceEnabled
+                            accessibilityServiceEnabled
                                 ? appLocalizations.authorized
                                 : appLocalizations.tapToAuthorize,
                           ),

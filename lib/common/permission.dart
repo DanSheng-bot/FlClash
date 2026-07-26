@@ -24,6 +24,13 @@ class Permissions {
   void check() {
     checkLocationPermissions();
     checkBatteryOptimizationDisable();
+    checkAccessibilityService();
+  }
+
+  Future<void> checkAccessibilityService() async {
+    if (!system.isAndroid) return;
+    final enabled = await app?.isAccessibilityServiceEnabled() ?? false;
+    globalState.container.read(accessibilityServiceEnabledProvider.notifier).value = enabled;
   }
 
   Future<void> checkBatteryOptimizationDisable() async {

@@ -497,6 +497,15 @@ class LocationPermissions extends _$LocationPermissions
   }
 }
 
+@Riverpod(keepAlive: true)
+class AccessibilityServiceEnabled extends _$AccessibilityServiceEnabled
+    with AutoDisposeNotifierMixin {
+  @override
+  bool build() {
+    return false;
+  }
+}
+
 List<Override> buildAppStateOverrides(AppState appState) {
   return [
     initProvider.overrideWithBuild((_, _) => appState.isInit),
@@ -519,6 +528,9 @@ List<Override> buildAppStateOverrides(AppState appState) {
     trafficsProvider.overrideWithBuild((_, _) => appState.traffics),
     totalTrafficProvider.overrideWithBuild((_, _) => appState.totalTraffic),
     realTunEnableProvider.overrideWithBuild((_, _) => appState.realTunEnable),
+    accessibilityServiceEnabledProvider.overrideWithBuild(
+      (_, _) => appState.accessibilityServiceEnabled,
+    ),
     systemUiOverlayStyleStateProvider.overrideWithBuild(
       (_, _) => appState.systemUiOverlayStyle,
     ),

@@ -2059,3 +2059,57 @@ abstract class _$LocationPermissions extends $Notifier<WifiSsidPermission> {
     return element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(AccessibilityServiceEnabled)
+final accessibilityServiceEnabledProvider =
+    AccessibilityServiceEnabledProvider._();
+
+final class AccessibilityServiceEnabledProvider
+    extends $NotifierProvider<AccessibilityServiceEnabled, bool> {
+  AccessibilityServiceEnabledProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'accessibilityServiceEnabledProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$accessibilityServiceEnabledHash();
+
+  @$internal
+  @override
+  AccessibilityServiceEnabled create() => AccessibilityServiceEnabled();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$accessibilityServiceEnabledHash() =>
+    r'b8a94e31d865675ad5a4123ad90eef58fdf09e82';
+
+abstract class _$AccessibilityServiceEnabled extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

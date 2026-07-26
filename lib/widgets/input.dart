@@ -93,6 +93,7 @@ class CommonCheckBox extends StatelessWidget {
 class InputDialog extends StatefulWidget {
   final String title;
   final String value;
+  final String? subtitle;
   final String? suffixText;
   final String? labelText;
   final String? resetValue;
@@ -108,6 +109,7 @@ class InputDialog extends StatefulWidget {
     super.key,
     required this.title,
     required this.value,
+    this.subtitle,
     this.suffixText,
     this.resetValue,
     this.hintText,
@@ -190,6 +192,13 @@ class _InputDialogState extends State<InputDialog> {
         child: Wrap(
           runSpacing: 16,
           children: [
+            if (widget.subtitle != null)
+              Text(
+                widget.subtitle!,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
             TextFormField(
               maxLength: widget.maxLength,
               inputFormatters: widget.inputFormatters,

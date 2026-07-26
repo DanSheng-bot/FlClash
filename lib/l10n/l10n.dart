@@ -4769,6 +4769,16 @@ class AppLocalizations {
     return Intl.message('Add SSID', name: 'addSsid', desc: '', args: []);
   }
 
+  /// `When connected to the specified Wi-Fi SSID, VPN will automatically pause.`
+  String get addSsidDesc {
+    return Intl.message(
+      'When connected to the specified Wi-Fi SSID, VPN will automatically pause.',
+      name: 'addSsidDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Edit SSID`
   String get editSsid {
     return Intl.message('Edit SSID', name: 'editSsid', desc: '', args: []);

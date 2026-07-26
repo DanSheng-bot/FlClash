@@ -108,6 +108,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "addProxyProviders": MessageLookupByLibrary.simpleMessage("添加代理集"),
     "addRule": MessageLookupByLibrary.simpleMessage("添加规则"),
     "addSsid": MessageLookupByLibrary.simpleMessage("添加 SSID"),
+    "addSsidDesc": MessageLookupByLibrary.simpleMessage(
+      "当连接到指定的 Wi-Fi SSID 时，VPN 将自动暂停。",
+    ),
     "addedRules": MessageLookupByLibrary.simpleMessage("附加规则"),
     "additionalParameters": MessageLookupByLibrary.simpleMessage("附加参数"),
     "address": MessageLookupByLibrary.simpleMessage("地址"),

@@ -583,6 +583,7 @@
   "accessibilityService": "辅助功能服务",
   "accessibilityServiceDesc": "用于监听应用打开状态，以实现按需暂停。点击前往设置。",
   "addSsid": "添加 SSID",
+  "addSsidDesc": "当连接到指定的 Wi-Fi SSID 时，VPN 将自动暂停。",
   "editSsid": "编辑 SSID",
   "authorized": "已授权",
   "tapToAuthorize": "点击授权",

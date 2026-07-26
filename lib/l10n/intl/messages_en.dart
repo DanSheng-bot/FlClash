@@ -125,6 +125,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "addRule": MessageLookupByLibrary.simpleMessage("Add Rule"),
     "addSsid": MessageLookupByLibrary.simpleMessage("Add SSID"),
+    "addSsidDesc": MessageLookupByLibrary.simpleMessage(
+      "When connected to the specified Wi-Fi SSID, VPN will automatically pause.",
+    ),
     "addedRules": MessageLookupByLibrary.simpleMessage("Added Rules"),
     "additionalParameters": MessageLookupByLibrary.simpleMessage(
       "Additional parameters",

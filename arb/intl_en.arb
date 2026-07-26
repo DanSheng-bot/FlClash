@@ -583,6 +583,7 @@
   "accessibilityService": "Accessibility Service",
   "accessibilityServiceDesc": "Used to monitor app state for on-demand pausing. Tap to go to settings.",
   "addSsid": "Add SSID",
+  "addSsidDesc": "When connected to the specified Wi-Fi SSID, VPN will automatically pause.",
   "editSsid": "Edit SSID",
   "authorized": "Authorized",
   "tapToAuthorize": "Tap to authorize",
